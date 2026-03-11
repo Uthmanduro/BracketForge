@@ -1,0 +1,16 @@
+package routes
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/uthmanduro/BracketForge/internal/config"
+	"github.com/uthmanduro/BracketForge/internal/handler"
+	// "github.com/uthmanduro/BracketForge/internal/middleware"clear
+)
+
+func RegisterUserRoutes(r *gin.RouterGroup, handler *handler.UserHandler, config *config.Config) {
+	userGroup := r.Group("/users")
+	{
+		userGroup.POST("/register", handler.RegisterUser)
+		userGroup.POST("/login", handler.LoginUser)
+	}
+}
