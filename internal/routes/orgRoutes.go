@@ -2,15 +2,18 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/uthmanduro/BracketForge/internal/config"
 	"github.com/uthmanduro/BracketForge/internal/handler"
+	"github.com/uthmanduro/BracketForge/internal/middleware"
 )
 
-func RegisterOrgRoutes(r *gin.RouterGroup, handler *handler.OrganizationHandler) {
+func RegisterOrgRoutes(r *gin.RouterGroup, cfg *config.Config, handler *handler.OrganizationHandler) {
 	orgGroup := r.Group("/orgs")
 	{
 		orgGroup.POST("/", handler.CreateOrganization)
-		orgGroup.GET("/:id", handler.GetOrganizationByID)
-		orgGroup.PUT("/:id", handler.UpdateOrganization)
-		orgGroup.DELETE("/:id", handler.DeleteOrganization)
+		orgGroup.Use(middleware.AuthMiddleware(cfg))
+		orgGroup.GET("/:id", middleware.RoleMiddleware("organizer"), handler.GetOrganizationByID)
+		orgGroup.PUT("/:id", middleware.RoleMiddleware("admin, organizer"), handler.UpdateOrganization)
+		orgGroup.DELETE("/:id", middleware.RoleMiddleware("admin"), handler.DeleteOrganization)
 	}
 }

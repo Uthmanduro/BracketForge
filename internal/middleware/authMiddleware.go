@@ -45,3 +45,28 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func RoleMiddleware(allowedRoles ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userRole, exists := c.Get("userRole")
+		if !exists {
+			c.AbortWithStatusJSON(403, gin.H{"error": "User role not found"})
+			return
+		}
+
+		roleStr, ok := userRole.(string)
+		if !ok {
+			c.AbortWithStatusJSON(403, gin.H{"error": "Invalid user role"})
+			return
+		}
+
+		for _, allowedRole := range allowedRoles {
+			if roleStr == allowedRole {
+				c.Next()
+				return
+			}
+		}
+
+		c.AbortWithStatusJSON(403, gin.H{"error": "Forbidden: insufficient permissions"})
+	}
+}

@@ -16,6 +16,7 @@ type Server struct {
 	orgHandler *handler.OrganizationHandler
 	userHandler *handler.UserHandler
 	tournamentHandler *handler.TournamentHandler
+	playerHandler *handler.PlayerHandler
 }
 
 func NewServer(
@@ -23,13 +24,15 @@ func NewServer(
 	db *gorm.DB, 
 	orgHandler *handler.OrganizationHandler, 
 	userHandler *handler.UserHandler, 
-	tournamentHandler *handler.TournamentHandler) *Server {
+	tournamentHandler *handler.TournamentHandler, 
+	playerHandler *handler.PlayerHandler) *Server {
 	return &Server{
 		config: config,
 		db: db,
 		orgHandler: orgHandler,
 		userHandler: userHandler,
 		tournamentHandler: tournamentHandler,
+		playerHandler: playerHandler,
 	}
 }
 
@@ -50,9 +53,10 @@ func (s *Server) setupRouter() *gin.Engine {
 	})
 
 	// Register organization routes
-	routes.RegisterOrgRoutes(r.Group("/api"), s.orgHandler)
+	routes.RegisterOrgRoutes(r.Group("/api"), s.config, s.orgHandler)
 	routes.RegisterUserRoutes(r.Group("/api"), s.userHandler, s.config)
-	routes.RegisterTournamentRoutes(r.Group("/api"), s.tournamentHandler) // Pass the tournament handler to the route registration
+	routes.RegisterTournamentRoutes(r.Group("/api"), s.config, s.tournamentHandler) // Pass the tournament handler to the route registration
+	routes.RegisterPlayerRoutes(r.Group("/api"), s.config, s.playerHandler) // Pass the player handler to the route registration
 
 	return r
 }

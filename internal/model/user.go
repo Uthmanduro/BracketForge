@@ -16,5 +16,5 @@ type User struct {
 	Organization   Organization `gorm:"foreignKey:OrganizationID" json:"organization"`
 	Email    string `gorm:"unique;not null" json:"email"`
 	Password string `gorm:"not null" json:"-"`
-	Role Role `gorm:"not null;default:'user'" json:"role"`
+	Role Role `gorm:"not null;default:'organizer'" json:"role"`
 }

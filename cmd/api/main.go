@@ -36,19 +36,22 @@ func main() {
 	orgRepo := repository.NewOrganizationRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	tournamentRepo := repository.NewTournamentRepo(db)
+	playerRepo := repository.NewPlayerRepository(db)
 
 	// Initialize services with repositories
 	orgService := service.NewOrganizationService(orgRepo)
 	authService := service.NewAuthService(config, userRepo)
 	tournamentService := service.NewTournamentService(tournamentRepo)
+	playerService := service.NewPlayerService(playerRepo)
 
 	// Initialize handler with services
 	orgHandler := handler.NewOrganizationHandler(orgService)
 	userHandler := handler.NewUserHandler(authService)
 	tournamentHandler := handler.NewTournamentHandler(tournamentService)
+	playerHandler := handler.NewPlayerHandler(playerService)
 
 	// Initialize and start the server
-	server := server.NewServer(config, db, orgHandler, userHandler, tournamentHandler)
+	server := server.NewServer(config, db, orgHandler, userHandler, tournamentHandler, playerHandler)
 	if err := server.Start(); err != nil {
 		fmt.Printf("Error starting server: %v\n", err)
 	}
