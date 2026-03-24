@@ -11,10 +11,11 @@ func RegisterPlayerRoutes(rg *gin.RouterGroup, cfg *config.Config, playerHandler
 	players := rg.Group("/players")
 	players.Use(middleware.AuthMiddleware(cfg))
 	{
-		players.POST("/",  playerHandler.CreatePlayer)
+		players.POST("/", middleware.RequireRole("admin", "organizer"), playerHandler.CreatePlayer)
+		players.GET("/", playerHandler.List)
 		players.GET("/:id", playerHandler.GetPlayerByID)
-		players.GET("/tournaments/:tournament_id", playerHandler.GetPlayersByTournamentID)
-		players.PUT("/:id", playerHandler.UpdatePlayer)
-		players.DELETE("/:id", playerHandler.DeletePlayer)
+		// players.GET("/organizations/", playerHandler.GetPlayersByOrgID)
+		players.PUT("/:id", middleware.RequireRole("admin", "organizer"), playerHandler.UpdatePlayer)
+		players.DELETE("/:id", middleware.RequireRole("admin"), playerHandler.DeletePlayer)
 	}
 }

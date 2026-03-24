@@ -19,19 +19,14 @@ type OrganizationRepo struct {
 }
 
 func NewOrganizationRepository(db *gorm.DB) *OrganizationRepo {
-	db.AutoMigrate(&model.Organization{}) // Ensure the Organization table is created
 	return &OrganizationRepo{db: db}
 }
 
-func (r *OrganizationRepo) CreateOrganization(ctx context.Context, name string) (uint, error) {
-	org := &model.Organization{Name: name}
-	if err := r.db.Create(org).Error; err != nil {
-		return 0, err
-	}
-	return org.ID, nil
+func (r *OrganizationRepo) Create(org *model.Organization) error {
+	return r.db.Create(org).Error
 }
 
-func (r *OrganizationRepo) GetOrganizationByID(ctx context.Context, id uint) (*model.Organization, error) {
+func (r *OrganizationRepo) GetByID(id string) (*model.Organization, error) {
 	var org model.Organization
 	if err := r.db.First(&org, id).Error; err != nil {
 		return nil, err
@@ -43,6 +38,6 @@ func (r *OrganizationRepo) UpdateOrganization(ctx context.Context, org *model.Or
 	return r.db.Save(org).Error
 }
 
-func (r *OrganizationRepo) DeleteOrganization(ctx context.Context, id uint) error {
+func (r *OrganizationRepo) DeleteOrganization(ctx context.Context, id string) error {
 	return r.db.Delete(&model.Organization{}, id).Error
 }

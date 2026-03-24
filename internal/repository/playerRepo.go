@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 
 	"github.com/uthmanduro/BracketForge/internal/model"
 	"gorm.io/gorm"
@@ -17,30 +16,28 @@ func NewPlayerRepository(db *gorm.DB) *PlayerRepository {
 	}
 }
 
-func (r *PlayerRepository) CreatePlayer(ctx context.Context, player *model.Player) error {
+func (r *PlayerRepository) Create(player *model.Player) error {
 	return r.DB.Create(player).Error
 }
 
-func (r *PlayerRepository) GetPlayerByID(ctx context.Context, id uint) (*model.Player, error) {
-	var player model.Player
-	if err := r.DB.First(&player, id).Error; err != nil {
-		return nil, err
-	}
-	return &player, nil
+func (r *PlayerRepository) GetByID(id, orgID string) (*model.Player, error) {
+	var p model.Player
+	return &p, r.DB.First(&p, "id = ? AND organization_id = ?", id, orgID).Error
 }
-
-func (r *PlayerRepository) GetPlayersByTournamentID(ctx context.Context, tournamentID uint) ([]model.Player, error) {
-	var players []model.Player
-	if err := r.DB.Where("tournament_id = ?", tournamentID).Preload("Tournament").Preload("Tournament.Organization").Find(&players).Error; err != nil {
-		return nil, err
-	}
-	return players, nil
+ 
+func (r *PlayerRepository) ListByOrg(orgID string) ([]*model.Player, error) {
+	var players []*model.Player
+	return players, r.DB.Where("organization_id = ?", orgID).Order("name").Find(&players).Error
 }
-
-func (r *PlayerRepository) UpdatePlayer(ctx context.Context, player *model.Player) error {
-	return r.DB.Save(player).Error
+ 
+func (r *PlayerRepository) Update(p *model.Player) error {
+	return r.DB.Model(p).Updates(map[string]interface{}{
+		"name":     p.Name,
+		"email":    p.Email,
+		"metadata": p.Metadata,
+	}).Error
 }
-
-func (r *PlayerRepository) DeletePlayer(ctx context.Context, id uint) error {
-	return r.DB.Delete(&model.Player{}, id).Error
+ 
+func (r *PlayerRepository) Delete(id, orgID string) error {
+	return r.DB.Delete(&model.Player{}, "id = ? AND organization_id = ?", id, orgID).Error
 }

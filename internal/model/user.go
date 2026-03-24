@@ -1,6 +1,10 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Role string
 
@@ -12,9 +16,26 @@ const (
 
 type User struct {
 	gorm.Model
-	OrganizationID uint `gorm:"not null" json:"organization_id"`
-	Organization   Organization `gorm:"foreignKey:OrganizationID" json:"organization"`
-	Email    string `gorm:"unique;not null" json:"email"`
-	Password string `gorm:"not null" json:"-"`
+	ID             string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	OrganizationID string    `gorm:"type:uuid;not null;index"                       json:"organization_id"`
+	Email          string    `gorm:"uniqueIndex;not null"                           json:"email"`
+	PasswordHash   string    `gorm:"not null"                                       json:"-"`
 	Role Role `gorm:"not null;default:'organizer'" json:"role"`
+	CreatedAt      time.Time `gorm:"autoCreateTime"                                 json:"created_at"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"    binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+	User  *User  `json:"user"`
+}
+
+type RegisterUserRequest struct {
+	Email    string `json:"email"    binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8"`
+	Role     string `json:"role"     binding:"required,oneof=admin organizer viewer"`
 }

@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 
 	"github.com/uthmanduro/BracketForge/internal/model"
 	"gorm.io/gorm"
@@ -19,21 +18,19 @@ type UserRepo struct {
 }
 
 func NewUserRepository(db *gorm.DB) *UserRepo {
-	db.AutoMigrate(&model.User{}) // Ensure the User table is created
 	return &UserRepo{db: db}
 }
 
-func (r *UserRepo) FindByEmail(ctx context.Context, email string) (*model.User, error) {
+func (r *UserRepo) GetByEmail(email string) (*model.User, error) {
 	var user model.User
-	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil // No user found with this email
-		}
-		return nil, err
-	}
-	return &user, nil
+	return &user, r.db.Where("email = ?", email).First(&user).Error
 }
 
-func (r *UserRepo) Create(ctx context.Context, user *model.User) error {
+func (r *UserRepo) Create(user *model.User) error {
 	return r.db.Create(user).Error
+}
+
+func (r *UserRepo) GetByID(id string) (*model.User, error) {
+	var u model.User
+	return &u, r.db.First(&u, "id = ?", id).Error
 }

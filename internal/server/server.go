@@ -53,10 +53,10 @@ func (s *Server) setupRouter() *gin.Engine {
 	})
 
 	// Register organization routes
-	routes.RegisterOrgRoutes(r.Group("/api"), s.config, s.orgHandler)
-	routes.RegisterUserRoutes(r.Group("/api"), s.userHandler, s.config)
-	routes.RegisterTournamentRoutes(r.Group("/api"), s.config, s.tournamentHandler) // Pass the tournament handler to the route registration
-	routes.RegisterPlayerRoutes(r.Group("/api"), s.config, s.playerHandler) // Pass the player handler to the route registration
+	routes.RegisterOrgRoutes(r.Group("/api/v1"), s.config, s.orgHandler)
+	routes.RegisterUserRoutes(r.Group("/api/v1"), s.userHandler, s.config)
+	routes.RegisterTournamentRoutes(r.Group("/api/v1"), s.config, s.tournamentHandler) // Pass the tournament handler to the route registration
+	routes.RegisterPlayerRoutes(r.Group("/api/v1"), s.config, s.playerHandler) // Pass the player handler to the route registration
 
 	return r
 }

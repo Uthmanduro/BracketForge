@@ -5,6 +5,7 @@ import (
 
 	"github.com/uthmanduro/BracketForge/internal/config"
 	"github.com/uthmanduro/BracketForge/internal/database"
+	"github.com/uthmanduro/BracketForge/internal/engine"
 	"github.com/uthmanduro/BracketForge/internal/handler"
 	"github.com/uthmanduro/BracketForge/internal/repository"
 	"github.com/uthmanduro/BracketForge/internal/server"
@@ -32,21 +33,38 @@ func main() {
 		return
 	}
 
+	store := repository.NewStore(db)
+
 	// Initialize repositories, services, and server here if needed
 	orgRepo := repository.NewOrganizationRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	tournamentRepo := repository.NewTournamentRepo(db)
 	playerRepo := repository.NewPlayerRepository(db)
+	stageRepo  := repository.NewStageRepo(db)
+	matchRepo  := repository.NewMatchRepo(db)
+	standRepo  := repository.NewStandingsRepo(db)
+
+	// ── Engines ───────────────────────────────────────────────────────
+	rrEngine       := engine.NewRoundRobinEngine(matchRepo, standRepo)
+	seEngine       := engine.NewSingleEliminationEngine(matchRepo)
+	groupEngine    := engine.NewGroupEngine(stageRepo, matchRepo, standRepo, rrEngine)
+	resultEngine   := engine.NewResultEngine(matchRepo, standRepo, stageRepo, store)
+	walkoverEngine := engine.NewWalkoverEngine(matchRepo)
+ 
 
 	// Initialize services with repositories
 	orgService := service.NewOrganizationService(orgRepo)
-	authService := service.NewAuthService(config, userRepo)
-	tournamentService := service.NewTournamentService(tournamentRepo)
+	userService := service.NewUserService(userRepo, config.JWTSecret)
+	tournamentService := service.NewTournamentService(
+		tournamentRepo, stageRepo, matchRepo, standRepo,
+		playerRepo, seEngine, rrEngine, groupEngine,
+		resultEngine, walkoverEngine,
+	)
 	playerService := service.NewPlayerService(playerRepo)
 
 	// Initialize handler with services
 	orgHandler := handler.NewOrganizationHandler(orgService)
-	userHandler := handler.NewUserHandler(authService)
+	userHandler := handler.NewUserHandler(userService)
 	tournamentHandler := handler.NewTournamentHandler(tournamentService)
 	playerHandler := handler.NewPlayerHandler(playerService)
 

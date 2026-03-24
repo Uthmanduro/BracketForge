@@ -1,63 +1,40 @@
 package handler
 
 import (
-	// "fmt"
-	"strconv"
-
 	"github.com/gin-gonic/gin"
+	"github.com/uthmanduro/BracketForge/internal/middleware"
+	"github.com/uthmanduro/BracketForge/internal/model"
 	"github.com/uthmanduro/BracketForge/internal/service"
 )
 
 type UserHandler struct {
-	AuthService *service.AuthService
+	UserService *service.UserService
 }
 
-type CreateUserRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-    Password string `json:"password" binding:"required,min=8"`
-    OrgID     string `json:"organization_id" binding:"required"`
-}
-
-type LoginUserRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
-}
-
-type UpdateUserRequest struct {
-    Email string `json:"email" binding:"omitempty,email"`
-	Password string `json:"password" binding:"omitempty,min=8"`
-}
-
-
-func NewUserHandler(authService *service.AuthService) *UserHandler {
+func NewUserHandler(userService *service.UserService) *UserHandler {
 	return &UserHandler{
-		AuthService: authService,
+		UserService: userService,
 	}
 }
 
 func (h *UserHandler) RegisterUser(c *gin.Context) {
-	var req CreateUserRequest
+	var req model.RegisterUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request data"})
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 	email := req.Email
 	password := req.Password
-	orgId := req.OrgID
+	role := req.Role
+	
 
 	// Basic validation
-	if email == "" || password == "" || orgId == "" {
-		c.JSON(400, gin.H{"error": "Email, password, and organization ID are required"})
+	if email == "" || password == "" {
+		c.JSON(400, gin.H{"error": "Email and password are required"})
 		return
 	}
 
-	stringOrgId, err := strconv.Atoi(orgId)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid organization ID"})
-		return
-	}
-
-	user, err := h.AuthService.Register(c.Request.Context(), email, password, uint(stringOrgId))
+	user, err := h.UserService.Register(middleware.OrgID(c), email, password, role)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to register user"})
 		return
@@ -67,7 +44,7 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 }
 
 func (h *UserHandler) LoginUser(c *gin.Context) {
-	var req LoginUserRequest
+	var req model.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid request data"})
 		return
@@ -80,11 +57,21 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	token, err := h.AuthService.Login(c.Request.Context(), email, password)
+	token, err := h.UserService.Login(email, password)
 	if err != nil {
 		c.JSON(401, gin.H{"error": "Invalid email or password"})
 		return
 	}
 
 	c.JSON(200, gin.H{"message": "Login successful", "token": token})
+}
+
+func (h *UserHandler) Me(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+	user, err := h.UserService.GetByID(userID.(string))
+	if err != nil {
+		c.JSON(404, gin.H{"error": "not found"})
+		return
+	}
+	c.JSON(200, user)
 }

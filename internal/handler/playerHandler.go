@@ -1,21 +1,14 @@
 package handler
 
 import (
-	"strconv"
-
 	"github.com/gin-gonic/gin"
+	"github.com/uthmanduro/BracketForge/internal/middleware"
+	"github.com/uthmanduro/BracketForge/internal/model"
 	"github.com/uthmanduro/BracketForge/internal/service"
 )
 
 type PlayerHandler struct {
 	PlayerService *service.PlayerService
-}
-
-type CreatePlayerRequest struct {
-	Name         string `json:"name" binding:"required"`
-	TournamentID uint   `json:"tournament_id" binding:"required"`
-	Seed         int    `json:"seed"`
-	Ranking      int    `json:"ranking"`
 }
 
 func NewPlayerHandler(playerService *service.PlayerService) *PlayerHandler {
@@ -25,13 +18,15 @@ func NewPlayerHandler(playerService *service.PlayerService) *PlayerHandler {
 }
 
 func (h *PlayerHandler) CreatePlayer(c *gin.Context) {
-	var req CreatePlayerRequest
+	var req model.CreatePlayerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid request data"})
 		return
 	}
 
-	player, err := h.PlayerService.CreatePlayer(c.Request.Context(), req.Name, req.TournamentID, req.Seed, req.Ranking)
+	orgID := middleware.OrgID(c)
+
+	player, err := h.PlayerService.Create(orgID, &req)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to create player"})
 		return
@@ -39,15 +34,20 @@ func (h *PlayerHandler) CreatePlayer(c *gin.Context) {
 	c.JSON(201, gin.H{"message": "Player created successfully", "player_id": player.ID})
 }
 
-func (h *PlayerHandler) GetPlayerByID(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
+func (h *PlayerHandler) List(c *gin.Context) {
+	players, err := h.PlayerService.List(middleware.OrgID(c))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid player ID"})
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	c.JSON(200, players)
+}
 
-	player, err := h.PlayerService.GetPlayerByID(c.Request.Context(), uint(id))
+func (h *PlayerHandler) GetPlayerByID(c *gin.Context) {
+	id := c.Param("id")
+
+	orgID := middleware.OrgID(c)
+	player, err := h.PlayerService.GetByID(id, orgID)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(404, gin.H{"error": "Player not found"})
@@ -59,15 +59,9 @@ func (h *PlayerHandler) GetPlayerByID(c *gin.Context) {
 	c.JSON(200, player)
 }
 
-func (h *PlayerHandler) GetPlayersByTournamentID(c *gin.Context) {
-	tournamentIDParam := c.Param("tournament_id")
-	tournamentID, err := strconv.Atoi(tournamentIDParam)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid tournament ID"})
-		return
-	}
-
-	players, err := h.PlayerService.GetPlayersByTournamentID(c.Request.Context(), uint(tournamentID))
+func (h *PlayerHandler) GetPlayersByOrgID(c *gin.Context) {
+	orgID := middleware.OrgID(c)
+	players, err := h.PlayerService.List(orgID)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to retrieve players"})
 		return
@@ -76,51 +70,28 @@ func (h *PlayerHandler) GetPlayersByTournamentID(c *gin.Context) {
 }
 
 func (h *PlayerHandler) UpdatePlayer(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid player ID"})
-		return
-	}
+	id := c.Param("id")
+	orgId := middleware.OrgID(c)
 
-	var req CreatePlayerRequest
+	var req model.CreatePlayerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid request data"})
 		return
 	}
 
-	player, err := h.PlayerService.GetPlayerByID(c.Request.Context(), uint(id))
-	if err != nil {
-		if err.Error() == "record not found" {
-			c.JSON(404, gin.H{"error": "Player not found"})
-		} else {
-			c.JSON(500, gin.H{"error": "Failed to retrieve player"})
-		}
-		return
-	}
-
-	player.Name = req.Name
-	player.TournamentID = req.TournamentID
-	player.Seed = req.Seed
-	player.Ranking = &req.Ranking
-
-	err = h.PlayerService.UpdatePlayer(c.Request.Context(), player)
+	player, err := h.PlayerService.Update(id, orgId, &req)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to update player"})
 		return
 	}
-	c.JSON(200, gin.H{"message": "Player updated successfully"})
+	c.JSON(200, gin.H{"message": "Player updated successfully", "player": player})
 }
 
 func (h *PlayerHandler) DeletePlayer(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid player ID"})
-		return
-	}
+	id := c.Param("id")
+	orgId := middleware.OrgID(c)
 
-	err = h.PlayerService.DeletePlayer(c.Request.Context(), uint(id))
+	err := h.PlayerService.Delete(id, orgId)
 	if err != nil {
 		if err.Error() == "record not found" {
 			c.JSON(404, gin.H{"error": "Player not found"})

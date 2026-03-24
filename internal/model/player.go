@@ -1,14 +1,25 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"encoding/json"
+	"time"
+
+	"gorm.io/gorm"
+)
+
 
 type Player struct {
 	gorm.Model
-	TournamentID uint `gorm:"not null" json:"tournament_id"`
-	Tournament   Tournament `gorm:"foreignKey:TournamentID" json:"tournament"`
-	Name  string `gorm:"not null" json:"name"`
-	Seed  int    `json:"seed"`
-	Ranking *int    `json:"ranking"`
-
-	Matches []Match `gorm:"many2many:match_players;" json:"matches"`
+	ID             string          `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	OrganizationID string          `gorm:"type:uuid;not null;index"                       json:"organization_id"`
+	Name           string          `gorm:"not null"                                       json:"name"`
+	Email          *string         `gorm:"default:null"                                   json:"email,omitempty"`
+	Metadata       json.RawMessage `gorm:"type:jsonb"                                     json:"metadata,omitempty"`
+	CreatedAt      time.Time       `gorm:"autoCreateTime"                                 json:"created_at"`
+}
+ 
+type CreatePlayerRequest struct {
+	Name     string          `json:"name"     binding:"required"`
+	Email    *string         `json:"email"`
+	Metadata json.RawMessage `json:"metadata"`
 }

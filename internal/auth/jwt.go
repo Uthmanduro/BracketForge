@@ -6,13 +6,25 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func GenerateJWT(userID uint, role string, secretKey string) (string, error) {
+type Claims struct {
+	UserID         string `json:"user_id"`
+	OrganizationID string `json:"organization_id"`
+	Role           string `json:"role"`
+	jwt.RegisteredClaims
+}
+
+func GenerateJWT(userID, role, orgID, secretKey string) (string, error) {
 	// Create a new JWT token with the user ID as a claim and sign it with the secret key
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"role":    role,
-		"expiresAt": jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // Token expires in 24 hours
-	})
+	claims := &Claims{
+		UserID:         userID,
+		OrganizationID: orgID,
+		Role:           role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		return "", err
@@ -20,9 +32,9 @@ func GenerateJWT(userID uint, role string, secretKey string) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateJWT(tokenString string, secretKey string) (*jwt.Token, uint, error) {
+func ValidateJWT(tokenString string, secretKey string) (*Claims, error) {
 	// Implementation for validating JWT token goes here
-	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(t *jwt.Token) (interface{}, error) {
 		// Validate the signing method
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
@@ -31,12 +43,12 @@ func ValidateJWT(tokenString string, secretKey string) (*jwt.Token, uint, error)
 		return []byte(secretKey), nil
 	})
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		if userID, ok := claims["user_id"].(float64); ok {
-			return token, uint(userID), nil
+	if claims, ok := token.Claims.(*Claims); ok {
+		if token.Valid {
+			return claims, nil
 		}
 	}
-	return nil, 0, nil
+	return nil, jwt.ErrInvalidKey
 }

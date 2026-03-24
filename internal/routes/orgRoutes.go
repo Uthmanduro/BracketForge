@@ -12,8 +12,6 @@ func RegisterOrgRoutes(r *gin.RouterGroup, cfg *config.Config, handler *handler.
 	{
 		orgGroup.POST("/", handler.CreateOrganization)
 		orgGroup.Use(middleware.AuthMiddleware(cfg))
-		orgGroup.GET("/:id", middleware.RoleMiddleware("organizer"), handler.GetOrganizationByID)
-		orgGroup.PUT("/:id", middleware.RoleMiddleware("admin, organizer"), handler.UpdateOrganization)
-		orgGroup.DELETE("/:id", middleware.RoleMiddleware("admin"), handler.DeleteOrganization)
+		orgGroup.GET("/:id", handler.GetOrganizationByID)
 	}
 }

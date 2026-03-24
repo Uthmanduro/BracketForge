@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/uthmanduro/BracketForge/internal/auth"
 	"github.com/uthmanduro/BracketForge/internal/config"
 )
@@ -27,46 +27,39 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 		tokenString = tokenParts[1]
 
 		// Validate the JWT token and extract user information
-		token, userID, err := auth.ValidateJWT(tokenString, cfg.JWTSecret)
+		claims, err := auth.ValidateJWT(tokenString, cfg.JWTSecret)
 		if err != nil {
 			c.AbortWithStatusJSON(401, gin.H{"error": "Invalid or expired token"})
 			return
 		}
 
 		// Store user information in the context for use in handlers
-		c.Set("userID", userID)
-		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			if role, ok := claims["role"].(string); ok {
-				c.Set("userRole", role)
-			}
-		}
-		// Continue to the next handler
+		c.Set("userID", claims.UserID)
+		c.Set("userRole", claims.Role)
+		c.Set("organizationID", claims.OrganizationID)
 		
+		// Continue to the next handler
 		c.Next()
 	}
 }
 
-func RoleMiddleware(allowedRoles ...string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		userRole, exists := c.Get("userRole")
-		if !exists {
-			c.AbortWithStatusJSON(403, gin.H{"error": "User role not found"})
-			return
-		}
-
-		roleStr, ok := userRole.(string)
-		if !ok {
-			c.AbortWithStatusJSON(403, gin.H{"error": "Invalid user role"})
-			return
-		}
-
-		for _, allowedRole := range allowedRoles {
-			if roleStr == allowedRole {
-				c.Next()
-				return
-			}
-		}
-
-		c.AbortWithStatusJSON(403, gin.H{"error": "Forbidden: insufficient permissions"})
+func RequireRole(roles ...string) gin.HandlerFunc {
+	allowed := make(map[string]bool, len(roles))
+	for _, r := range roles {
+		allowed[r] = true
 	}
+	return func(c *gin.Context) {
+		role, _ := c.Get("role")
+		if !allowed[role.(string)] {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
+			return
+		}
+		c.Next()
+	}
+}
+ 
+func OrgID(c *gin.Context) string {
+	v, _ := c.Get("organization_id")
+	s, _ := v.(string)
+	return s
 }

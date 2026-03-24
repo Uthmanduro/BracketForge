@@ -12,11 +12,17 @@ func MigrateDB(db *gorm.DB) error {
 	models := []interface{}{
 		&model.Organization{},
 		&model.User{},
-		&model.Tournament{},
 		&model.Player{},
+		&model.Tournament{},
+		&model.TournamentRegistration{},
 		&model.Stage{},
 		&model.Group{},
+		&model.GroupRegistration{},
 		&model.Match{},
+		&model.MatchParticipant{},
+		&model.SetScore{},
+		&model.Standings{},
+
 	}
 
 	for _, model := range models {
