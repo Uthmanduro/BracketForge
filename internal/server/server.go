@@ -8,6 +8,9 @@ import (
 	"github.com/uthmanduro/BracketForge/internal/handler"
 	"github.com/uthmanduro/BracketForge/internal/routes"
 	"gorm.io/gorm"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -51,6 +54,9 @@ func (s *Server) setupRouter() *gin.Engine {
 			"message": "Server healthy",
 		})
 	})
+
+	// Swagger UI — http://localhost:8080/swagger/index.html
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Register organization routes
 	routes.RegisterOrgRoutes(r.Group("/api/v1"), s.config, s.orgHandler)

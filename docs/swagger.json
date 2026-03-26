@@ -1,0 +1,2892 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Racket sports tournament management engine. Supports single elimination, round robin, and group + knockout formats with set-based scoring, three-way tiebreakers, BYE handling, and result correction.",
+        "title": "BracketForge API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "BracketForge Support",
+            "email": "support@bracketforge.io"
+        },
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/organizations": {
+            "post": {
+                "description": "Creates a new organisation. This is the onboarding entry point — no auth required.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "organisations"
+                ],
+                "summary": "Create organisation",
+                "parameters": [
+                    {
+                        "description": "Organisation name",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler.CreateUpdateOrganizationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Organization"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the organisation for the authenticated user's org ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "organisations"
+                ],
+                "summary": "Get organisation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Organisation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Organization"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/players": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns all players in the authenticated organisation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "List players",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "players": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Player"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a new player profile within the organisation. Admin or organizer only.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Create player",
+                "parameters": [
+                    {
+                        "description": "Player details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.CreatePlayerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "player_id": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/players/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a single player by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Get player",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Player ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "player": {
+                                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Player"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates name, email, or metadata for a player. Admin or organizer only.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Update player",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Player ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated player details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.CreatePlayerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "player": {
+                                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Player"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Permanently deletes a player from the organisation. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "players"
+                ],
+                "summary": "Delete player",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Player ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns all tournaments belonging to the authenticated organisation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tournaments"
+                ],
+                "summary": "List tournaments",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "tournaments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Tournament"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a new tournament. Format must be one of: single_elimination, round_robin, group_knockout. BestOf must be 3 or 5.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tournaments"
+                ],
+                "summary": "Create tournament",
+                "parameters": [
+                    {
+                        "description": "Tournament configuration",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.CreateTournamentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "tournament_id": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a single tournament by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tournaments"
+                ],
+                "summary": "Get tournament",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "tournament": {
+                                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Tournament"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/groups/{groupId}/standings": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns standings for a single group with the full tiebreaker cascade applied (head-to-head → mutual set ratio → mutual game ratio → overall set ratio → overall game ratio → draw). Each entry includes a rank field.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "standings"
+                ],
+                "summary": "Get group standings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "Standings": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Standings"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/matches/{matchId}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a match with its full participant list and set-by-set scores",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "matches"
+                ],
+                "summary": "Get match detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Match ID",
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "match": {
+                                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchDetail"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/matches/{matchId}/result": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Voids the previous result, reverses standings contributions, and resubmits with corrected scores. Blocked if the next match in the bracket has already been completed. Admin only.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "matches"
+                ],
+                "summary": "Correct match result",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Match ID",
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Corrected set scores",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SubmitResultRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "result_detail": {
+                                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchDetail"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Records the full set-by-set result for a match. Validates set count against best_of, updates standings for group/round-robin stages, and advances the winner to the next bracket slot atomically.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "matches"
+                ],
+                "summary": "Submit match result",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Match ID",
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Set scores",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SubmitResultRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "result_detail": {
+                                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchDetail"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/matches/{matchId}/schedule": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Sets the scheduled date and time for a match",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "matches"
+                ],
+                "summary": "Schedule match",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Match ID",
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Scheduled time (RFC3339)",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ScheduleMatchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "scheduled_at": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/registrations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns all registrations for a tournament including player names",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "registrations"
+                ],
+                "summary": "List registrations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "registrations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.TournamentRegistration"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registers a player into a tournament. Tournament must be in draft or registration status.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "registrations"
+                ],
+                "summary": "Register player",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Player registration",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.RegisterPlayerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "player_registration": {
+                                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.TournamentRegistration"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/registrations/{rid}": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates a player's registration status. Setting withdrawn or disqualified while the tournament is active triggers the walkover engine for all pending matches.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "registrations"
+                ],
+                "summary": "Update registration status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Registration ID",
+                        "name": "rid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New status",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.UpdateRegistrationStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/stages": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns all stages for a tournament ordered by stage_order",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stages"
+                ],
+                "summary": "List stages",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "stages": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Stage"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a stage within a tournament. Type must be one of: group, knockout, round_robin. Stage order controls the sequence (1 = first played).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stages"
+                ],
+                "summary": "Create stage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Stage configuration",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.CreateStageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "stage": {
+                                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Stage"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/stages/{stageId}/bracket": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generates the match bracket for a knockout or round-robin stage. BYE matches are auto-completed. Use /draw for group stages instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bracket"
+                ],
+                "summary": "Generate bracket",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Stage ID",
+                        "name": "stageId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "matches": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Match"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/stages/{stageId}/draw": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Distributes registered players into groups using serpentine seeding and generates all round-robin matches within each group. Only valid for stages of type group.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bracket"
+                ],
+                "summary": "Run group draw",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Stage ID",
+                        "name": "stageId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Number of groups",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.DrawRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "groups": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Group"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/stages/{stageId}/matches": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns all matches for a stage ordered by round and position",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "matches"
+                ],
+                "summary": "List stage matches",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Stage ID",
+                        "name": "stageId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "matches": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Match"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/stages/{stageId}/standings": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns standings for all groups in a stage ordered by points. For group stages, use the group standings endpoint to get tiebreaker-resolved rankings per group.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "standings"
+                ],
+                "summary": "Get stage standings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Stage ID",
+                        "name": "stageId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "Standings": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Standings"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournaments/{id}/status": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Moves the tournament through its lifecycle: draft → registration → active → completed. Each step must be taken in order.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tournaments"
+                ],
+                "summary": "Transition tournament status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tournament ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New status",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler.UpdateStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "status": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "description": "Authenticates with email and password. Returns a JWT token to use in the Authorization header.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Credentials",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the profile of the currently authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Get current user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.User"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/register": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a new user within the authenticated organisation. Admin only.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register user",
+                "parameters": [
+                    {
+                        "description": "User details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.RegisterUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_uthmanduro_BracketForge_internal_model.CreatePlayerRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.CreateStageRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "stage_order",
+                "type"
+            ],
+            "properties": {
+                "advance_count": {
+                    "type": "integer"
+                },
+                "best_of": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stage_order": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "group",
+                        "knockout",
+                        "round_robin"
+                    ]
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.CreateTournamentRequest": {
+            "type": "object",
+            "required": [
+                "best_of",
+                "format",
+                "name"
+            ],
+            "properties": {
+                "best_of": {
+                    "type": "integer",
+                    "enum": [
+                        3,
+                        5
+                    ]
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "format": {
+                    "type": "string",
+                    "enum": [
+                        "single_elimination",
+                        "round_robin",
+                        "group_knockout"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "scoring_rules": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "third_place_match": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.DrawRequest": {
+            "type": "object",
+            "required": [
+                "number_of_groups"
+            ],
+            "properties": {
+                "number_of_groups": {
+                    "type": "integer",
+                    "minimum": 2
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.Group": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stage_id": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.Match": {
+            "type": "object",
+            "properties": {
+                "best_of": {
+                    "type": "integer"
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "group_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_bye": {
+                    "type": "boolean"
+                },
+                "loser_next_match_id": {
+                    "type": "string"
+                },
+                "loser_next_match_slot": {
+                    "type": "integer"
+                },
+                "match_position": {
+                    "type": "integer"
+                },
+                "next_match_id": {
+                    "type": "string"
+                },
+                "next_match_slot": {
+                    "type": "integer"
+                },
+                "round": {
+                    "type": "integer"
+                },
+                "scheduled_at": {
+                    "type": "string"
+                },
+                "stage_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchStatus"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "winner_registration_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.MatchDetail": {
+            "type": "object",
+            "properties": {
+                "match": {
+                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Match"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchParticipant"
+                    }
+                },
+                "sets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SetScore"
+                    }
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.MatchParticipant": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "match_id": {
+                    "type": "string"
+                },
+                "player_name": {
+                    "description": "Joined",
+                    "type": "string"
+                },
+                "registration_id": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "string"
+                },
+                "slot": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.MatchStatus": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "completed"
+            ],
+            "x-enum-varnames": [
+                "MatchStatusPending",
+                "MatchStatusCompleted"
+            ]
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.Organization": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.Player": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organization_id": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.RegisterPlayerRequest": {
+            "type": "object",
+            "required": [
+                "player_id"
+            ],
+            "properties": {
+                "player_id": {
+                    "type": "string"
+                },
+                "seed": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.RegisterUserRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "role"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "admin",
+                        "organizer",
+                        "viewer"
+                    ]
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.Role": {
+            "type": "string",
+            "enum": [
+                "admin",
+                "organizer",
+                "guest"
+            ],
+            "x-enum-varnames": [
+                "RoleAdmin",
+                "RoleOrganizer",
+                "RoleGuest"
+            ]
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.ScheduleMatchRequest": {
+            "type": "object",
+            "required": [
+                "scheduled_at"
+            ],
+            "properties": {
+                "scheduled_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.SetScore": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_tiebreak": {
+                    "type": "boolean"
+                },
+                "match_id": {
+                    "type": "string"
+                },
+                "p1_games": {
+                    "type": "integer"
+                },
+                "p1_tiebreak_points": {
+                    "type": "integer"
+                },
+                "p2_games": {
+                    "type": "integer"
+                },
+                "p2_tiebreak_points": {
+                    "type": "integer"
+                },
+                "set_number": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.SetScoreInput": {
+            "type": "object",
+            "required": [
+                "set_number"
+            ],
+            "properties": {
+                "is_tiebreak": {
+                    "type": "boolean"
+                },
+                "p1_games": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "p1_tiebreak_points": {
+                    "type": "integer"
+                },
+                "p2_games": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "p2_tiebreak_points": {
+                    "type": "integer"
+                },
+                "set_number": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.Stage": {
+            "type": "object",
+            "properties": {
+                "advance_count": {
+                    "type": "integer"
+                },
+                "best_of": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stage_order": {
+                    "type": "integer"
+                },
+                "tournament_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.StageType"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.StageType": {
+            "type": "string",
+            "enum": [
+                "group",
+                "knockout",
+                "round_robin"
+            ],
+            "x-enum-varnames": [
+                "GroupStage",
+                "KnockoutStage",
+                "RoundRobinStage"
+            ]
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.Standings": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "games_lost": {
+                    "type": "integer"
+                },
+                "games_won": {
+                    "type": "integer"
+                },
+                "group_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "losses": {
+                    "type": "integer"
+                },
+                "played": {
+                    "type": "integer"
+                },
+                "player_name": {
+                    "description": "Joined",
+                    "type": "string"
+                },
+                "points": {
+                    "type": "integer"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "registration_id": {
+                    "type": "string"
+                },
+                "sets_lost": {
+                    "type": "integer"
+                },
+                "sets_won": {
+                    "type": "integer"
+                },
+                "stage_id": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "wins": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.SubmitResultRequest": {
+            "type": "object",
+            "required": [
+                "sets"
+            ],
+            "properties": {
+                "sets": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SetScoreInput"
+                    }
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.Tournament": {
+            "type": "object",
+            "properties": {
+                "best_of": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "format": {
+                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.TournamentFormat"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "organization_id": {
+                    "type": "string"
+                },
+                "scoring_rules": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.TournamentStatus"
+                },
+                "third_place_match": {
+                    "type": "boolean"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.TournamentFormat": {
+            "type": "string",
+            "enum": [
+                "single_elimination",
+                "round_robin",
+                "group_knockout"
+            ],
+            "x-enum-varnames": [
+                "SingleElimination",
+                "RoundRobin",
+                "GroupKnockout"
+            ]
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.TournamentRegistration": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "player_id": {
+                    "type": "string"
+                },
+                "player_name": {
+                    "description": "Joined",
+                    "type": "string"
+                },
+                "registered_at": {
+                    "type": "string"
+                },
+                "seed": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tournament_id": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.TournamentStatus": {
+            "type": "string",
+            "enum": [
+                "draft",
+                "active",
+                "completed"
+            ],
+            "x-enum-varnames": [
+                "Draft",
+                "Active",
+                "Completed"
+            ]
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.UpdateRegistrationStatusRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "registered",
+                        "checked_in",
+                        "withdrawn",
+                        "disqualified"
+                    ]
+                }
+            }
+        },
+        "github_com_uthmanduro_BracketForge_internal_model.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "organization_id": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Role"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "internal_handler.CreateUpdateOrganizationRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handler.UpdateStatusRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "registration",
+                        "active",
+                        "completed"
+                    ]
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Enter your JWT token as: Bearer \u003ctoken\u003e",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

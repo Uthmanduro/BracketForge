@@ -1,7 +1,25 @@
+// @title           BracketForge API
+// @version         1.0.0
+// @description     Racket sports tournament management engine. Supports single elimination, round robin, and group + knockout formats with set-based scoring, three-way tiebreakers, BYE handling, and result correction.
+// @termsOfService  http://swagger.io/terms/
+ 
+// @contact.name   BracketForge Support
+// @contact.email  support@bracketforge.io
+ 
+// @host      localhost:8085
+// @BasePath  /api/v1
+ 
+// @securityDefinitions.apikey BearerAuth
+// @in                         header
+// @name                       Authorization
+// @description                Enter your JWT token as: Bearer <token>
+
 package main
 
 import (
 	"fmt"
+
+	_ "github.com/uthmanduro/BracketForge/docs"
 
 	"github.com/uthmanduro/BracketForge/internal/config"
 	"github.com/uthmanduro/BracketForge/internal/database"

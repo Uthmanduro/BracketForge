@@ -1,0 +1,1834 @@
+basePath: /api/v1
+definitions:
+  github_com_uthmanduro_BracketForge_internal_model.CreatePlayerRequest:
+    properties:
+      email:
+        type: string
+      metadata:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.CreateStageRequest:
+    properties:
+      advance_count:
+        type: integer
+      best_of:
+        type: integer
+      name:
+        type: string
+      stage_order:
+        type: integer
+      type:
+        enum:
+        - group
+        - knockout
+        - round_robin
+        type: string
+    required:
+    - name
+    - stage_order
+    - type
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.CreateTournamentRequest:
+    properties:
+      best_of:
+        enum:
+        - 3
+        - 5
+        type: integer
+      end_date:
+        type: string
+      format:
+        enum:
+        - single_elimination
+        - round_robin
+        - group_knockout
+        type: string
+      name:
+        type: string
+      scoring_rules:
+        items:
+          type: integer
+        type: array
+      start_date:
+        type: string
+      third_place_match:
+        type: boolean
+    required:
+    - best_of
+    - format
+    - name
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.DrawRequest:
+    properties:
+      number_of_groups:
+        minimum: 2
+        type: integer
+    required:
+    - number_of_groups
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.Group:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: string
+      name:
+        type: string
+      stage_id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.Match:
+    properties:
+      best_of:
+        type: integer
+      completed_at:
+        type: string
+      created_at:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      group_id:
+        type: string
+      id:
+        type: string
+      is_bye:
+        type: boolean
+      loser_next_match_id:
+        type: string
+      loser_next_match_slot:
+        type: integer
+      match_position:
+        type: integer
+      next_match_id:
+        type: string
+      next_match_slot:
+        type: integer
+      round:
+        type: integer
+      scheduled_at:
+        type: string
+      stage_id:
+        type: string
+      status:
+        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchStatus'
+      updatedAt:
+        type: string
+      winner_registration_id:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.MatchDetail:
+    properties:
+      match:
+        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Match'
+      participants:
+        items:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchParticipant'
+        type: array
+      sets:
+        items:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SetScore'
+        type: array
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.MatchParticipant:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: string
+      match_id:
+        type: string
+      player_name:
+        description: Joined
+        type: string
+      registration_id:
+        type: string
+      result:
+        type: string
+      slot:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.MatchStatus:
+    enum:
+    - pending
+    - completed
+    type: string
+    x-enum-varnames:
+    - MatchStatusPending
+    - MatchStatusCompleted
+  github_com_uthmanduro_BracketForge_internal_model.Organization:
+    properties:
+      created_at:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.Player:
+    properties:
+      created_at:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      id:
+        type: string
+      metadata:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      organization_id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.RegisterPlayerRequest:
+    properties:
+      player_id:
+        type: string
+      seed:
+        type: integer
+    required:
+    - player_id
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.RegisterUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      role:
+        enum:
+        - admin
+        - organizer
+        - viewer
+        type: string
+    required:
+    - email
+    - password
+    - role
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.Role:
+    enum:
+    - admin
+    - organizer
+    - guest
+    type: string
+    x-enum-varnames:
+    - RoleAdmin
+    - RoleOrganizer
+    - RoleGuest
+  github_com_uthmanduro_BracketForge_internal_model.ScheduleMatchRequest:
+    properties:
+      scheduled_at:
+        type: string
+    required:
+    - scheduled_at
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.SetScore:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: string
+      is_tiebreak:
+        type: boolean
+      match_id:
+        type: string
+      p1_games:
+        type: integer
+      p1_tiebreak_points:
+        type: integer
+      p2_games:
+        type: integer
+      p2_tiebreak_points:
+        type: integer
+      set_number:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.SetScoreInput:
+    properties:
+      is_tiebreak:
+        type: boolean
+      p1_games:
+        minimum: 0
+        type: integer
+      p1_tiebreak_points:
+        type: integer
+      p2_games:
+        minimum: 0
+        type: integer
+      p2_tiebreak_points:
+        type: integer
+      set_number:
+        type: integer
+    required:
+    - set_number
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.Stage:
+    properties:
+      advance_count:
+        type: integer
+      best_of:
+        type: integer
+      created_at:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: string
+      name:
+        type: string
+      stage_order:
+        type: integer
+      tournament_id:
+        type: string
+      type:
+        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.StageType'
+      updatedAt:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.StageType:
+    enum:
+    - group
+    - knockout
+    - round_robin
+    type: string
+    x-enum-varnames:
+    - GroupStage
+    - KnockoutStage
+    - RoundRobinStage
+  github_com_uthmanduro_BracketForge_internal_model.Standings:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      games_lost:
+        type: integer
+      games_won:
+        type: integer
+      group_id:
+        type: string
+      id:
+        type: string
+      losses:
+        type: integer
+      played:
+        type: integer
+      player_name:
+        description: Joined
+        type: string
+      points:
+        type: integer
+      rank:
+        type: integer
+      registration_id:
+        type: string
+      sets_lost:
+        type: integer
+      sets_won:
+        type: integer
+      stage_id:
+        type: string
+      updated_at:
+        type: string
+      updatedAt:
+        type: string
+      wins:
+        type: integer
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.SubmitResultRequest:
+    properties:
+      sets:
+        items:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SetScoreInput'
+        minItems: 1
+        type: array
+    required:
+    - sets
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.Tournament:
+    properties:
+      best_of:
+        type: integer
+      created_at:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      end_date:
+        type: string
+      format:
+        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.TournamentFormat'
+      id:
+        type: string
+      name:
+        type: string
+      organization_id:
+        type: string
+      scoring_rules:
+        items:
+          type: integer
+        type: array
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.TournamentStatus'
+      third_place_match:
+        type: boolean
+      updatedAt:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.TournamentFormat:
+    enum:
+    - single_elimination
+    - round_robin
+    - group_knockout
+    type: string
+    x-enum-varnames:
+    - SingleElimination
+    - RoundRobin
+    - GroupKnockout
+  github_com_uthmanduro_BracketForge_internal_model.TournamentRegistration:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: string
+      player_id:
+        type: string
+      player_name:
+        description: Joined
+        type: string
+      registered_at:
+        type: string
+      seed:
+        type: integer
+      status:
+        type: string
+      tournament_id:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.TournamentStatus:
+    enum:
+    - draft
+    - active
+    - completed
+    type: string
+    x-enum-varnames:
+    - Draft
+    - Active
+    - Completed
+  github_com_uthmanduro_BracketForge_internal_model.UpdateRegistrationStatusRequest:
+    properties:
+      status:
+        enum:
+        - registered
+        - checked_in
+        - withdrawn
+        - disqualified
+        type: string
+    required:
+    - status
+    type: object
+  github_com_uthmanduro_BracketForge_internal_model.User:
+    properties:
+      created_at:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      id:
+        type: string
+      organization_id:
+        type: string
+      role:
+        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Role'
+      updatedAt:
+        type: string
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  internal_handler.CreateUpdateOrganizationRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  internal_handler.UpdateStatusRequest:
+    properties:
+      status:
+        enum:
+        - registration
+        - active
+        - completed
+        type: string
+    required:
+    - status
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@bracketforge.io
+    name: BracketForge Support
+  description: Racket sports tournament management engine. Supports single elimination,
+    round robin, and group + knockout formats with set-based scoring, three-way tiebreakers,
+    BYE handling, and result correction.
+  termsOfService: http://swagger.io/terms/
+  title: BracketForge API
+  version: 1.0.0
+paths:
+  /organizations:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new organisation. This is the onboarding entry point
+        — no auth required.
+      parameters:
+      - description: Organisation name
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.CreateUpdateOrganizationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Organization'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      summary: Create organisation
+      tags:
+      - organisations
+  /organizations/{id}:
+    get:
+      description: Returns the organisation for the authenticated user's org ID
+      parameters:
+      - description: Organisation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Organization'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get organisation
+      tags:
+      - organisations
+  /players:
+    get:
+      description: Returns all players in the authenticated organisation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    players:
+                      items:
+                        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Player'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List players
+      tags:
+      - players
+    post:
+      consumes:
+      - application/json
+      description: Creates a new player profile within the organisation. Admin or
+        organizer only.
+      parameters:
+      - description: Player details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.CreatePlayerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    player_id:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create player
+      tags:
+      - players
+  /players/{id}:
+    delete:
+      description: Permanently deletes a player from the organisation. Admin only.
+      parameters:
+      - description: Player ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete player
+      tags:
+      - players
+    get:
+      description: Returns a single player by ID
+      parameters:
+      - description: Player ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    player:
+                      $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Player'
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get player
+      tags:
+      - players
+    put:
+      consumes:
+      - application/json
+      description: Updates name, email, or metadata for a player. Admin or organizer
+        only.
+      parameters:
+      - description: Player ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated player details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.CreatePlayerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    player:
+                      $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Player'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update player
+      tags:
+      - players
+  /tournaments:
+    get:
+      description: Returns all tournaments belonging to the authenticated organisation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    tournaments:
+                      items:
+                        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Tournament'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List tournaments
+      tags:
+      - tournaments
+    post:
+      consumes:
+      - application/json
+      description: 'Creates a new tournament. Format must be one of: single_elimination,
+        round_robin, group_knockout. BestOf must be 3 or 5.'
+      parameters:
+      - description: Tournament configuration
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.CreateTournamentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    tournament_id:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create tournament
+      tags:
+      - tournaments
+  /tournaments/{id}:
+    get:
+      description: Returns a single tournament by ID
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    tournament:
+                      $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Tournament'
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get tournament
+      tags:
+      - tournaments
+  /tournaments/{id}/groups/{groupId}/standings:
+    get:
+      description: Returns standings for a single group with the full tiebreaker cascade
+        applied (head-to-head → mutual set ratio → mutual game ratio → overall set
+        ratio → overall game ratio → draw). Each entry includes a rank field.
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    Standings:
+                      items:
+                        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Standings'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get group standings
+      tags:
+      - standings
+  /tournaments/{id}/matches/{matchId}:
+    get:
+      description: Returns a match with its full participant list and set-by-set scores
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Match ID
+        in: path
+        name: matchId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    match:
+                      $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchDetail'
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get match detail
+      tags:
+      - matches
+  /tournaments/{id}/matches/{matchId}/result:
+    post:
+      consumes:
+      - application/json
+      description: Records the full set-by-set result for a match. Validates set count
+        against best_of, updates standings for group/round-robin stages, and advances
+        the winner to the next bracket slot atomically.
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Match ID
+        in: path
+        name: matchId
+        required: true
+        type: string
+      - description: Set scores
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SubmitResultRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    result_detail:
+                      $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchDetail'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Submit match result
+      tags:
+      - matches
+    put:
+      consumes:
+      - application/json
+      description: Voids the previous result, reverses standings contributions, and
+        resubmits with corrected scores. Blocked if the next match in the bracket
+        has already been completed. Admin only.
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Match ID
+        in: path
+        name: matchId
+        required: true
+        type: string
+      - description: Corrected set scores
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SubmitResultRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    result_detail:
+                      $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.MatchDetail'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Correct match result
+      tags:
+      - matches
+  /tournaments/{id}/matches/{matchId}/schedule:
+    patch:
+      consumes:
+      - application/json
+      description: Sets the scheduled date and time for a match
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Match ID
+        in: path
+        name: matchId
+        required: true
+        type: string
+      - description: Scheduled time (RFC3339)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ScheduleMatchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    scheduled_at:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Schedule match
+      tags:
+      - matches
+  /tournaments/{id}/registrations:
+    get:
+      description: Returns all registrations for a tournament including player names
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    registrations:
+                      items:
+                        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.TournamentRegistration'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List registrations
+      tags:
+      - registrations
+    post:
+      consumes:
+      - application/json
+      description: Registers a player into a tournament. Tournament must be in draft
+        or registration status.
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Player registration
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.RegisterPlayerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    player_registration:
+                      $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.TournamentRegistration'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Register player
+      tags:
+      - registrations
+  /tournaments/{id}/registrations/{rid}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates a player's registration status. Setting withdrawn or disqualified
+        while the tournament is active triggers the walkover engine for all pending
+        matches.
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Registration ID
+        in: path
+        name: rid
+        required: true
+        type: string
+      - description: New status
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.UpdateRegistrationStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    status:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update registration status
+      tags:
+      - registrations
+  /tournaments/{id}/stages:
+    get:
+      description: Returns all stages for a tournament ordered by stage_order
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    stages:
+                      items:
+                        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Stage'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List stages
+      tags:
+      - stages
+    post:
+      consumes:
+      - application/json
+      description: 'Creates a stage within a tournament. Type must be one of: group,
+        knockout, round_robin. Stage order controls the sequence (1 = first played).'
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Stage configuration
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.CreateStageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    stage:
+                      $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Stage'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create stage
+      tags:
+      - stages
+  /tournaments/{id}/stages/{stageId}/bracket:
+    post:
+      description: Generates the match bracket for a knockout or round-robin stage.
+        BYE matches are auto-completed. Use /draw for group stages instead.
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Stage ID
+        in: path
+        name: stageId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    matches:
+                      items:
+                        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Match'
+                      type: array
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Generate bracket
+      tags:
+      - bracket
+  /tournaments/{id}/stages/{stageId}/draw:
+    post:
+      consumes:
+      - application/json
+      description: Distributes registered players into groups using serpentine seeding
+        and generates all round-robin matches within each group. Only valid for stages
+        of type group.
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Stage ID
+        in: path
+        name: stageId
+        required: true
+        type: string
+      - description: Number of groups
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.DrawRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    groups:
+                      items:
+                        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Group'
+                      type: array
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Run group draw
+      tags:
+      - bracket
+  /tournaments/{id}/stages/{stageId}/matches:
+    get:
+      description: Returns all matches for a stage ordered by round and position
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Stage ID
+        in: path
+        name: stageId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    matches:
+                      items:
+                        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Match'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List stage matches
+      tags:
+      - matches
+  /tournaments/{id}/stages/{stageId}/standings:
+    get:
+      description: Returns standings for all groups in a stage ordered by points.
+        For group stages, use the group standings endpoint to get tiebreaker-resolved
+        rankings per group.
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Stage ID
+        in: path
+        name: stageId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    Standings:
+                      items:
+                        $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Standings'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get stage standings
+      tags:
+      - standings
+  /tournaments/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: 'Moves the tournament through its lifecycle: draft → registration
+        → active → completed. Each step must be taken in order.'
+      parameters:
+      - description: Tournament ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New status
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handler.UpdateStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  properties:
+                    status:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Transition tournament status
+      tags:
+      - tournaments
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates with email and password. Returns a JWT token to use
+        in the Authorization header.
+      parameters:
+      - description: Credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  additionalProperties:
+                    type: string
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      summary: Login
+      tags:
+      - auth
+  /users/me:
+    get:
+      description: Returns the profile of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.User'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - auth
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user within the authenticated organisation. Admin
+        only.
+      parameters:
+      - description: User details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Register user
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    description: 'Enter your JWT token as: Bearer <token>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

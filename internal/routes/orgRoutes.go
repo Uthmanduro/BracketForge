@@ -8,7 +8,7 @@ import (
 )
 
 func RegisterOrgRoutes(r *gin.RouterGroup, cfg *config.Config, handler *handler.OrganizationHandler) {
-	orgGroup := r.Group("/orgs")
+	orgGroup := r.Group("/organizations")
 	{
 		orgGroup.POST("/", handler.CreateOrganization)
 		orgGroup.Use(middleware.AuthMiddleware(cfg))
