@@ -26,9 +26,25 @@ func (r *OrganizationRepo) Create(org *model.Organization) error {
 	return r.db.Create(org).Error
 }
 
+func (r *OrganizationRepo) GetAll() ([]*model.Organization, error) {
+	var orgs []*model.Organization
+	if err := r.db.Find(&orgs).Error; err != nil {
+		return nil, err
+	}
+	return orgs, nil
+}
+
 func (r *OrganizationRepo) GetByID(id string) (*model.Organization, error) {
 	var org model.Organization
-	if err := r.db.First(&org, id).Error; err != nil {
+	if err := r.db.First(&org, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &org, nil
+}
+
+func (r *OrganizationRepo) GetByName(name string) (*model.Organization, error) {
+	var org model.Organization
+	if err := r.db.Where("name = ?", name).First(&org).Error; err != nil {
 		return nil, err
 	}
 	return &org, nil

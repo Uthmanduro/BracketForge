@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"gorm.io/gorm"
 )
 
 
 type Player struct {
-	gorm.Model
 	ID             string          `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	OrganizationID string          `gorm:"type:uuid;not null;index"                       json:"organization_id"`
 	Name           string          `gorm:"not null"                                       json:"name"`

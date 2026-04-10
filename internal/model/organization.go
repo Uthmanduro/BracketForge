@@ -2,13 +2,10 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 
 type Organization struct {
-	gorm.Model
 	ID        string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	Name      string    `gorm:"not null"                                        json:"name"`
 	CreatedAt time.Time `gorm:"autoCreateTime"                                  json:"created_at"`

@@ -20,6 +20,59 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/organizations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a list of all organisations. This is primarily for testing and debugging purposes.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "organisations"
+                ],
+                "summary": "List organisations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        " Message": {
+                                            "type": "string"
+                                        },
+                                        "Data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Organization"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Creates a new organisation. This is the onboarding entry point — no auth required.",
                 "consumes": [
@@ -2370,22 +2423,13 @@ const docTemplate = `{
         "github_com_uthmanduro_BracketForge_internal_model.Organization": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                },
-                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -2443,11 +2487,15 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
+                "org_id",
                 "password",
                 "role"
             ],
             "properties": {
                 "email": {
+                    "type": "string"
+                },
+                "org_id": {
                     "type": "string"
                 },
                 "password": {

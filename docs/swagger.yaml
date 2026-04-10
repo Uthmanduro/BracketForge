@@ -190,15 +190,9 @@ definitions:
     properties:
       created_at:
         type: string
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
       id:
         type: string
       name:
-        type: string
-      updatedAt:
         type: string
     type: object
   github_com_uthmanduro_BracketForge_internal_model.Player:
@@ -237,6 +231,8 @@ definitions:
     properties:
       email:
         type: string
+      org_id:
+        type: string
       password:
         minLength: 8
         type: string
@@ -248,6 +244,7 @@ definitions:
         type: string
     required:
     - email
+    - org_id
     - password
     - role
     type: object
@@ -537,7 +534,7 @@ definitions:
     required:
     - status
     type: object
-host: localhost:8080
+host: localhost:8085
 info:
   contact:
     email: support@bracketforge.io
@@ -550,6 +547,38 @@ info:
   version: 1.0.0
 paths:
   /organizations:
+    get:
+      description: Returns a list of all organisations. This is primarily for testing
+        and debugging purposes.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.SuccessResponse'
+            - properties:
+                ' Message':
+                  type: string
+                Data:
+                  items:
+                    $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Organization'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List organisations
+      tags:
+      - organisations
     post:
       consumes:
       - application/json

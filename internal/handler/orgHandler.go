@@ -45,6 +45,13 @@ func (h *OrganizationHandler) CreateOrganization(c *gin.Context) {
 		c.JSON(400, model.ErrorResponse{Error: "Organization name is required"})
 		return
 	}
+
+	checkName, err := h.orgService.GetByName(name)
+	if err == nil && checkName != nil {
+		c.JSON(400, model.ErrorResponse{Error: "Organization name already exists"})
+		return
+	}
+
 	org, err := h.orgService.Create(name)
 	if err != nil {
 		c.JSON(500, model.ErrorResponse{Error: "Failed to create organization"})
@@ -66,12 +73,6 @@ func (h *OrganizationHandler) CreateOrganization(c *gin.Context) {
 // @Router       /organizations/{id} [get]
 func (h *OrganizationHandler) GetOrganizationByID(c *gin.Context) {
 	id := c.Param("id")
-	
-	// idUint, err := strconv.ParseUint(id, 10, 64)
-	// if err != nil {
-	// 	c.JSON(400, gin.H{"error": "Invalid organization ID"})
-	// 	return
-	// }
 
 	org, err := h.orgService.GetByID(id)
 	if err != nil {
@@ -82,59 +83,22 @@ func (h *OrganizationHandler) GetOrganizationByID(c *gin.Context) {
 	c.JSON(200, model.SuccessResponse{Message: "Organization retrieved successfully", Data: org})
 }
 
-// func (h *OrganizationHandler) UpdateOrganization(c *gin.Context) {
-// 	// Get organization ID from URL parameter and new name from form data
-// 	id := c.Param("id")
-// 	var req CreateUpdateOrganizationRequest
-// 	if err := c.ShouldBindJSON(&req); err != nil {
-// 		c.JSON(400, gin.H{"error": "Invalid request data"})
-// 		return
-// 	}
+// GetAll godoc
+// @Summary      List organisations
+// @Description  Returns a list of all organisations. This is primarily for testing and debugging purposes.
+// @Tags         organisations
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} model.SuccessResponse{Data=[]model.Organization, Message=string}
+// @Failure      401 {object} model.ErrorResponse
+// @Failure      500 {object} model.ErrorResponse
+// @Router       /organizations [get]
+func (h *OrganizationHandler) GetAllOrganization(c *gin.Context) {
+	orgs, err := h.orgService.GetAll()
+	if err != nil {
+		c.JSON(500, model.ErrorResponse{Error: "Failed to retrieve organizations"})
+		return
+	}
 
-// 	name := req.Name
-// 	if name == "" {
-// 		c.JSON(400, gin.H{"error": "Organization name is required"})
-// 		return
-// 	}
-
-// 	// Convert ID to uint
-// 	// idUint, err := strconv.ParseUint(id, 10, 64)
-// 	// if err != nil {
-// 	// 	c.JSON(400, gin.H{"error": "Invalid organization ID"})
-// 	// 	return
-// 	// }
-	
-// 	// Retrieve existing organization, update name, and save changes
-// 	org, err := h.orgService.GetByID(id)
-// 	if err != nil {
-// 		c.JSON(404, gin.H{"error": "Organization not found"})
-// 		return
-// 	}
-// 	org.Name = name
-
-// 	// Save updated organization
-// 	err = h.orgService.UpdateOrganization(c.Request.Context(), org)
-// 	if err != nil {
-// 		c.JSON(500, gin.H{"error": "Failed to update organization"})
-// 		return
-// 	}
-
-// 	c.JSON(200, gin.H{"message": "Organization updated successfully", "organization": org})
-// }
-
-// func (h *OrganizationHandler) DeleteOrganization(c *gin.Context) {
-// 	id := c.Param("id")
-// 	idUint, err := strconv.ParseUint(id, 10, 64)
-// 	if err != nil {
-// 		c.JSON(400, gin.H{"error": "Invalid organization ID"})
-// 		return
-// 	}
-
-// 	err = h.orgService.DeleteOrganization(c.Request.Context(), uint(idUint))
-// 	if err != nil {
-// 		c.JSON(404, gin.H{"error": "Organization not found"})
-// 		return
-// 	}
-
-// 	c.JSON(204, gin.H{"message": "Organization deleted successfully"})
-// }
+	c.JSON(200, model.SuccessResponse{Message: "Organizations retrieved successfully", Data: orgs})
+}

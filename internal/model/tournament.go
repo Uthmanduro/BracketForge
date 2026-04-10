@@ -3,8 +3,6 @@ package model
 import (
 	"encoding/json"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type TournamentFormat string
@@ -24,7 +22,6 @@ const (
 
 
 type Tournament struct {
-	gorm.Model
 	ID              string          `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	OrganizationID  string          `gorm:"type:uuid;not null;index"                       json:"organization_id"`
 	Name            string          `gorm:"not null"                                       json:"name"`
@@ -39,7 +36,6 @@ type Tournament struct {
 }
 
 type TournamentRegistration struct {
-	gorm.Model
 	ID           string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	TournamentID string    `gorm:"type:uuid;not null;index"                       json:"tournament_id"`
 	PlayerID     string    `gorm:"type:uuid;not null;index"                       json:"player_id"`
@@ -48,6 +44,8 @@ type TournamentRegistration struct {
 	RegisteredAt time.Time `gorm:"autoCreateTime"                                 json:"registered_at"`
 	// Joined
 	PlayerName string `gorm:"-" json:"player_name,omitempty"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
 func (TournamentRegistration) TableName() string { return "tournament_registrations" }

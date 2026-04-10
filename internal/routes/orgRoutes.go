@@ -11,6 +11,7 @@ func RegisterOrgRoutes(r *gin.RouterGroup, cfg *config.Config, handler *handler.
 	orgGroup := r.Group("/organizations")
 	{
 		orgGroup.POST("/", handler.CreateOrganization)
+		orgGroup.GET("/", handler.GetAllOrganization)
 		orgGroup.Use(middleware.AuthMiddleware(cfg))
 		orgGroup.GET("/:id", handler.GetOrganizationByID)
 	}

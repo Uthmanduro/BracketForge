@@ -95,10 +95,10 @@ func (s *UserService) Register(orgID, email, password, role string) (*model.User
 func (s *UserService) Login(email, password string) (*model.LoginResponse, error) {
 	u, err := s.repo.GetByEmail(email)
 	if err != nil {
-		return nil, errors.New("invalid credentials")
+		return nil, errors.New("invalid email or password")
 	}
-	if !auth.VerifyPassword(u.PasswordHash, password) {
-		return nil, errors.New("invalid credentials")
+	if !auth.VerifyPassword(password, u.PasswordHash) {
+		return nil, errors.New("password not match")
 	}
 	token, err := auth.GenerateJWT(u.ID,  string(u.Role), u.OrganizationID, s.jwtSecret)
 	if err != nil {

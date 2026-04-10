@@ -3,7 +3,6 @@ package model
 import (
 	"time"
 
-	"gorm.io/gorm"
 )
 
 type StageType string
@@ -15,7 +14,6 @@ const (
 )
 
 type Stage struct {
-	gorm.Model
 	ID           string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	TournamentID string    `gorm:"type:uuid;not null;index"                       json:"tournament_id"`
 	Name         string    `gorm:"not null"                                       json:"name"`
@@ -27,17 +25,19 @@ type Stage struct {
 }
 
 type Group struct {
-	gorm.Model
 	ID      string `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	StageID string `gorm:"type:uuid;not null;index"                       json:"stage_id"`
 	Name    string `gorm:"not null"                                       json:"name"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
 type GroupRegistration struct {
-	gorm.Model
 	ID             string `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	GroupID        string `gorm:"type:uuid;not null;index"                       json:"group_id"`
 	RegistrationID string `gorm:"type:uuid;not null;index"                       json:"registration_id"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
 func (GroupRegistration) TableName() string { return "group_registrations" }
@@ -48,6 +48,7 @@ type CreateStageRequest struct {
 	StageOrder   int    `json:"stage_order"   binding:"required"`
 	AdvanceCount *int   `json:"advance_count"`
 	BestOf       *int   `json:"best_of"`
+
 }
 
 type DrawRequest struct {

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/uthmanduro/BracketForge/internal/middleware"
 	"github.com/uthmanduro/BracketForge/internal/model"
 	"github.com/uthmanduro/BracketForge/internal/service"
 )
@@ -39,6 +38,7 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 	email := req.Email
 	password := req.Password
 	role := req.Role
+	orgID := req.OrgID
 	
 
 	// Basic validation
@@ -47,7 +47,7 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	user, err := h.UserService.Register(middleware.OrgID(c), email, password, role)
+	user, err := h.UserService.Register(orgID, email, password, role)
 	if err != nil {
 		c.JSON(500, model.ErrorResponse{Error: "Failed to register user"})
 		return
@@ -102,7 +102,7 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 // @Failure      404 {object} model.ErrorResponse
 // @Router       /users/me [get]
 func (h *UserHandler) Me(c *gin.Context) {
-	userID, _ := c.Get("user_id")
+	userID, _ := c.Get("userID")
 	user, err := h.UserService.GetByID(userID.(string))
 	if err != nil {
 		c.JSON(404, model.ErrorResponse{Error: "User not found"})

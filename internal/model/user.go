@@ -3,7 +3,6 @@ package model
 import (
 	"time"
 
-	"gorm.io/gorm"
 )
 
 type Role string
@@ -15,7 +14,6 @@ const (
 )
 
 type User struct {
-	gorm.Model
 	ID             string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	OrganizationID string    `gorm:"type:uuid;not null;index"                       json:"organization_id"`
 	Email          string    `gorm:"uniqueIndex;not null"                           json:"email"`
@@ -38,4 +36,5 @@ type RegisterUserRequest struct {
 	Email    string `json:"email"    binding:"required,email"`
 	Password string `json:"password" binding:"required,min=8"`
 	Role     string `json:"role"     binding:"required,oneof=admin organizer viewer"`
+	OrgID	string `json:"org_id"   binding:"required,uuid"`
 }
