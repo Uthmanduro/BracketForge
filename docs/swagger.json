@@ -2147,10 +2147,7 @@
                     "type": "string"
                 },
                 "metadata": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "type": "object"
                 },
                 "name": {
                     "type": "string"
@@ -2253,11 +2250,8 @@
         "github_com_uthmanduro_BracketForge_internal_model.Group": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
                     "type": "string"
@@ -2268,7 +2262,7 @@
                 "stage_id": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -2431,14 +2425,8 @@
         "github_com_uthmanduro_BracketForge_internal_model.Player": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "email": {
                     "type": "string"
@@ -2456,9 +2444,6 @@
                     "type": "string"
                 },
                 "organization_id": {
-                    "type": "string"
-                },
-                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -2605,14 +2590,8 @@
                 "best_of": {
                     "type": "integer"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
                     "type": "string"
@@ -2628,9 +2607,6 @@
                 },
                 "type": {
                     "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.StageType"
-                },
-                "updatedAt": {
-                    "type": "string"
                 }
             }
         },
@@ -2737,14 +2713,8 @@
                 "best_of": {
                     "type": "integer"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "end_date": {
                     "type": "string"
@@ -2775,9 +2745,6 @@
                 },
                 "third_place_match": {
                     "type": "boolean"
-                },
-                "updatedAt": {
-                    "type": "string"
                 }
             }
         },
@@ -2797,11 +2764,8 @@
         "github_com_uthmanduro_BracketForge_internal_model.TournamentRegistration": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
                     "type": "string"
@@ -2825,7 +2789,7 @@
                 "tournament_id": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -2863,14 +2827,8 @@
         "github_com_uthmanduro_BracketForge_internal_model.User": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "email": {
                     "type": "string"
@@ -2883,9 +2841,6 @@
                 },
                 "role": {
                     "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Role"
-                },
-                "updatedAt": {
-                    "type": "string"
                 }
             }
         },

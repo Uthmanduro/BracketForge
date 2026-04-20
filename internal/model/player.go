@@ -19,5 +19,11 @@ type Player struct {
 type CreatePlayerRequest struct {
 	Name     string          `json:"name"     binding:"required"`
 	Email    *string         `json:"email"`
-	Metadata json.RawMessage `json:"metadata"`
+	Metadata json.RawMessage `json:"metadata" swaggertype:"object"`
+}
+
+type UpdatePlayerRequest struct {
+    Name     *string         `json:"name"`
+    Email    *string         `json:"email"`
+    Metadata json.RawMessage `json:"metadata"`
 }

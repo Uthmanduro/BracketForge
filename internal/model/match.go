@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type MatchStatus string
@@ -14,7 +12,6 @@ const (
 )
 
 type Match struct {
-	gorm.Model
 	ID                   string     `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	StageID              string     `gorm:"type:uuid;not null;index"                       json:"stage_id"`
 	GroupID              *string    `gorm:"type:uuid;index;default:null"                   json:"group_id,omitempty"`
@@ -34,7 +31,6 @@ type Match struct {
 }
 
 type MatchParticipant struct {
-	gorm.Model
 	ID             string  `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	MatchID        string  `gorm:"type:uuid;not null;index"                       json:"match_id"`
 	RegistrationID string  `gorm:"type:uuid;not null;index"                       json:"registration_id"`
@@ -47,7 +43,6 @@ type MatchParticipant struct {
 func (MatchParticipant) TableName() string { return "match_participants" }
 
 type SetScore struct {
-	gorm.Model
 	ID               string `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	MatchID          string `gorm:"type:uuid;not null;index"                       json:"match_id"`
 	SetNumber        int    `gorm:"not null"                                       json:"set_number"`
@@ -61,11 +56,10 @@ type SetScore struct {
 func (SetScore) TableName() string { return "set_scores" }
 
 type Standings struct {
-	gorm.Model
 	ID             string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
-	StageID        string    `gorm:"type:uuid;not null;index"                       json:"stage_id"`
-	GroupID        *string   `gorm:"type:uuid;index;default:null"                   json:"group_id,omitempty"`
-	RegistrationID string    `gorm:"type:uuid;not null;index"                       json:"registration_id"`
+	StageID        string    `gorm:"type:uuid;not null;uniqueIndex:idx_stage_reg_group"                       json:"stage_id"`
+	GroupID        *string   `gorm:"type:uuid;uniqueIndex:idx_stage_reg_group;default:null"                   json:"group_id,omitempty"`
+	RegistrationID string    `gorm:"type:uuid;not null;uniqueIndex:idx_stage_reg_group"                       json:"registration_id"`
 	Played         int       `gorm:"not null;default:0"                             json:"played"`
 	Wins           int       `gorm:"not null;default:0"                             json:"wins"`
 	Losses         int       `gorm:"not null;default:0"                             json:"losses"`

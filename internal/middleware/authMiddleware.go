@@ -49,7 +49,7 @@ func RequireRole(roles ...string) gin.HandlerFunc {
 		allowed[r] = true
 	}
 	return func(c *gin.Context) {
-		role, _ := c.Get("role")
+		role, _ := c.Get("userRole")
 		if !allowed[role.(string)] {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "insufficient permissions"})
 			return
@@ -59,7 +59,7 @@ func RequireRole(roles ...string) gin.HandlerFunc {
 }
  
 func OrgID(c *gin.Context) string {
-	v, _ := c.Get("organization_id")
+	v, _ := c.Get("organizationID")
 	s, _ := v.(string)
 	return s
 }

@@ -24,6 +24,11 @@ func (r *PlayerRepository) GetByID(id, orgID string) (*model.Player, error) {
 	var p model.Player
 	return &p, r.DB.First(&p, "id = ? AND organization_id = ?", id, orgID).Error
 }
+
+func (r *PlayerRepository) GetByEmail(email, orgID string) (*model.Player, error) {
+	var p model.Player
+	return &p, r.DB.Where("email = ? AND organization_id = ?", email, orgID).First(&p).Error
+}
  
 func (r *PlayerRepository) ListByOrg(orgID string) ([]*model.Player, error) {
 	var players []*model.Player

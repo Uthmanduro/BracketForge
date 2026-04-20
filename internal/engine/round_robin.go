@@ -1,35 +1,3 @@
-// package engine
-
-// import (
-// 	"errors"
-
-// 	"github.com/uthmanduro/BracketForge/internal/model"
-// )
-
-// func GenerateRoundRobinBracket(players []model.Player) ([]model.Match, error) {
-// 	// Implementation of round-robin bracket generation
-// 	// Each player plays against every other player once
-// 	if len(players) < 2 {
-// 		return nil, errors.New("at least 2 players are required to generate a bracket")
-// 	}
-
-// 	matches := []model.Match{}
-
-// 	for i := 0; i < len(players); i++ {
-// 		for j := i + 1; j < len(players); j++ {
-// 			match := model.Match{
-// 				Player1ID: &players[i].ID,
-// 				Player2ID: &players[j].ID,
-// 				Status:    model.MatchStatusPending,
-// 			}
-// 			matches = append(matches, match)
-// 		}
-// 	}
-	
-// 	return matches, nil
-// }
-
-
 package engine
 
 import (
@@ -37,6 +5,7 @@ import (
 
 	"github.com/uthmanduro/BracketForge/internal/model"
 	"github.com/uthmanduro/BracketForge/internal/repository"
+	"gorm.io/gorm"
 )
 
 type RoundRobinEngine struct {
@@ -56,7 +25,7 @@ func (e *RoundRobinEngine) GenerateMatches(
 ) ([]*model.Match, error) {
 	n := len(registrations)
 	if n < 2 {
-		return nil, fmt.Errorf("need at least 2 players, got %d", n)
+		// return nil, fmt.Errorf("need at least 2 players, got %d", n)
 	}
 
 	bestOf := tournament.BestOf
@@ -145,4 +114,11 @@ func (e *RoundRobinEngine) GenerateMatches(
 	}
 
 	return allMatches, nil
+}
+
+func (e *RoundRobinEngine) WithTx(tx *gorm.DB) *RoundRobinEngine {
+	return &RoundRobinEngine{
+		matchRepo:     e.matchRepo.WithTx(tx),
+		standingsRepo: e.standingsRepo.WithTx(tx),
+	}
 }

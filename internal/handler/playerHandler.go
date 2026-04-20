@@ -40,6 +40,16 @@ func (h *PlayerHandler) CreatePlayer(c *gin.Context) {
 
 	orgID := middleware.OrgID(c)
 
+	checkPlayer, err := h.PlayerService.GetByEmail(*req.Email, orgID)
+	if err != nil && err.Error() != "record not found" {
+		c.JSON(500, model.ErrorResponse{Error: "Failed to check existing player"})
+		return
+	}
+	if err == nil && checkPlayer != nil {
+		c.JSON(400, model.ErrorResponse{Error: "Player with this email already exists"})
+		return
+	}
+
 	player, err := h.PlayerService.Create(orgID, &req)
 	if err != nil {
 		c.JSON(500, model.ErrorResponse{Error: "Failed to create player"})
@@ -123,7 +133,7 @@ func (h *PlayerHandler) UpdatePlayer(c *gin.Context) {
 	id := c.Param("id")
 	orgId := middleware.OrgID(c)
 
-	var req model.CreatePlayerRequest
+	var req model.UpdatePlayerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, model.ErrorResponse{Error: "Invalid request data"})
 		return

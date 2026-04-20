@@ -267,7 +267,7 @@ func (h *TournamentHandler) RunGroupDraw(c *gin.Context) {
 		c.JSON(400, model.ErrorResponse{Error: err.Error()})
 		return
 	}
-	groups, err := h.TournamentService.RunGroupDraw(c.Param("id"), middleware.OrgID(c), c.Param("stageId"), &req)
+	groups, err := h.TournamentService.RunGroupDraw(c.Request.Context(), c.Param("id"), middleware.OrgID(c), c.Param("stageId"), &req)
 	if err != nil {
 		c.JSON(400, model.ErrorResponse{Error: err.Error()})
 		return

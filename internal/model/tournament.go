@@ -55,9 +55,9 @@ type CreateTournamentRequest struct {
 	Format          string          `json:"format"            binding:"required,oneof=single_elimination round_robin group_knockout"`
 	BestOf          int             `json:"best_of"           binding:"required,oneof=3 5"`
 	ThirdPlaceMatch bool            `json:"third_place_match"`
-	ScoringRules    json.RawMessage `json:"scoring_rules"`
-	StartDate       *time.Time      `json:"start_date"`
-	EndDate         *time.Time      `json:"end_date"`
+	ScoringRules    json.RawMessage `json:"scoring_rules" swaggertype:"object"`
+	StartDate       *time.Time      `json:"start_date"` //"2026-04-12T00:00:00Z"
+	EndDate         *time.Time      `json:"end_date"` // "2026-04-12T00:00:00Z"
 }
 
 type RegisterPlayerRequest struct {

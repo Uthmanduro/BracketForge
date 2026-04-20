@@ -190,6 +190,8 @@ func (r *MatchRepo) GetMutualSetStats(groupID string, registrationIDs []string) 
 
 // ── Tx helpers (used inside store.RunInTx) ─────────────────────────────────
 
+func (r *MatchRepo) WithTx(tx *gorm.DB) *MatchRepo { return &MatchRepo{db: tx} }
+
 func CreateMatchTx(tx *gorm.DB, m *model.Match) error {
 	return tx.Create(m).Error
 }

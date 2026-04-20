@@ -2153,10 +2153,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "metadata": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "type": "object"
                 },
                 "name": {
                     "type": "string"
@@ -2259,11 +2256,8 @@ const docTemplate = `{
         "github_com_uthmanduro_BracketForge_internal_model.Group": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
                     "type": "string"
@@ -2274,7 +2268,7 @@ const docTemplate = `{
                 "stage_id": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -2437,14 +2431,8 @@ const docTemplate = `{
         "github_com_uthmanduro_BracketForge_internal_model.Player": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "email": {
                     "type": "string"
@@ -2462,9 +2450,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "organization_id": {
-                    "type": "string"
-                },
-                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -2611,14 +2596,8 @@ const docTemplate = `{
                 "best_of": {
                     "type": "integer"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
                     "type": "string"
@@ -2634,9 +2613,6 @@ const docTemplate = `{
                 },
                 "type": {
                     "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.StageType"
-                },
-                "updatedAt": {
-                    "type": "string"
                 }
             }
         },
@@ -2743,14 +2719,8 @@ const docTemplate = `{
                 "best_of": {
                     "type": "integer"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "end_date": {
                     "type": "string"
@@ -2781,9 +2751,6 @@ const docTemplate = `{
                 },
                 "third_place_match": {
                     "type": "boolean"
-                },
-                "updatedAt": {
-                    "type": "string"
                 }
             }
         },
@@ -2803,11 +2770,8 @@ const docTemplate = `{
         "github_com_uthmanduro_BracketForge_internal_model.TournamentRegistration": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
                     "type": "string"
@@ -2831,7 +2795,7 @@ const docTemplate = `{
                 "tournament_id": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -2869,14 +2833,8 @@ const docTemplate = `{
         "github_com_uthmanduro_BracketForge_internal_model.User": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "email": {
                     "type": "string"
@@ -2889,9 +2847,6 @@ const docTemplate = `{
                 },
                 "role": {
                     "$ref": "#/definitions/github_com_uthmanduro_BracketForge_internal_model.Role"
-                },
-                "updatedAt": {
-                    "type": "string"
                 }
             }
         },

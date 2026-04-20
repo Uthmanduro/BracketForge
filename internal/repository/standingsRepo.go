@@ -102,3 +102,5 @@ func upsertStandings(db *gorm.DB, s *model.Standings) error {
 		}),
 	}).Create(s).Error
 }
+
+func (r *StandingsRepo) WithTx(tx *gorm.DB) *StandingsRepo { return &StandingsRepo{db: tx} }

@@ -1,48 +1,17 @@
-// package engine
-
-// import (
-// 	"errors"
-// 	"math/rand"
-
-// 	"github.com/uthmanduro/BracketForge/internal/model"
-// )
-
-// func DistributePlayersIntoGroups(players []model.Player, numGroups int) ([]model.Group, error) {
-// 	if numGroups <= 0 {
-// 		return nil, errors.New("number of groups must be positive")
-// 	}
-
-// 	// Shuffle players to randomize group distribution
-// 	rand.Shuffle(len(players), func(i, j int) {
-// 		players[i], players[j] = players[j], players[i]
-// 	})
-
-// 	groups := make([]model.Group, numGroups)
-// 	for i := range groups {
-// 		groups[i].Name = "Group " + string('A'+i)
-
-// 	}
-
-// 	for i, player := range players {
-// 		groupIndex := i % numGroups
-// 		groups[groupIndex].Players = append(groups[groupIndex].Players, player)
-// 	}
-
-// 	return groups, nil
-// }
-
-
 package engine
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
 	"github.com/uthmanduro/BracketForge/internal/model"
 	"github.com/uthmanduro/BracketForge/internal/repository"
+	"gorm.io/gorm"
 )
 
 type GroupEngine struct {
+	store *repository.Store
 	stageRepo     *repository.StageRepo
 	matchRepo     *repository.MatchRepo
 	standingsRepo *repository.StandingsRepo
@@ -50,15 +19,17 @@ type GroupEngine struct {
 }
 
 func NewGroupEngine(
+	store *repository.Store,
 	sr *repository.StageRepo,
 	mr *repository.MatchRepo,
 	standingsRepo *repository.StandingsRepo,
 	rrEngine *RoundRobinEngine,
 ) *GroupEngine {
-	return &GroupEngine{stageRepo: sr, matchRepo: mr, standingsRepo: standingsRepo, rrEngine: rrEngine}
+	return &GroupEngine{store: store, stageRepo: sr, matchRepo: mr, standingsRepo: standingsRepo, rrEngine: rrEngine}
 }
 
 func (e *GroupEngine) Draw(
+	ctx context.Context,
 	stage *model.Stage,
 	tournament *model.Tournament,
 	registrations []*model.TournamentRegistration,
@@ -71,42 +42,59 @@ func (e *GroupEngine) Draw(
 		return nil, fmt.Errorf("not enough players for %d groups", numberOfGroups)
 	}
 
+
 	groups := make([]*model.Group, numberOfGroups)
-	for i := 0; i < numberOfGroups; i++ {
-		g := &model.Group{
-			StageID: stage.ID,
-			Name:    fmt.Sprintf("Group %s", string(rune('A'+i))),
-		}
-		if err := e.stageRepo.CreateGroup(g); err != nil {
-			return nil, fmt.Errorf("create group %s: %w", g.Name, err)
-		}
-		groups[i] = g
-	}
+	err := e.store.RunInTx(ctx, func(tx *gorm.DB) error {
 
-	// Serpentine seeding.
-	groupAssignments := make([][]*model.TournamentRegistration, numberOfGroups)
-	for i, reg := range registrations {
-		row := i / numberOfGroups
-		col := i % numberOfGroups
-		if row%2 == 1 {
-			col = numberOfGroups - 1 - col
-		}
-		groupAssignments[col] = append(groupAssignments[col], reg)
-	}
+		// Use tx-aware repos
+		stageRepo := e.stageRepo.WithTx(tx)
+		rrEngine := e.rrEngine.WithTx(tx)
 
-	for gi, group := range groups {
-		for _, reg := range groupAssignments[gi] {
-			gr := &model.GroupRegistration{GroupID: group.ID, RegistrationID: reg.ID}
-			if err := e.stageRepo.AddGroupRegistration(gr); err != nil {
-				return nil, fmt.Errorf("assign player to group: %w", err)
+		for i := 0; i < numberOfGroups; i++ {
+			g := &model.Group{
+				StageID: stage.ID,
+				Name:    fmt.Sprintf("Group %s", string(rune('A'+i))),
+			}
+			if err := stageRepo.CreateGroup(g); err != nil {
+				return fmt.Errorf("create group %s: %w", g.Name, err)
+			}
+			groups[i] = g
+		}
+
+		// Serpentine seeding.
+		groupAssignments := make([][]*model.TournamentRegistration, numberOfGroups)
+		for i, reg := range registrations {
+			row := i / numberOfGroups
+			col := i % numberOfGroups
+			if row%2 == 1 {
+				col = numberOfGroups - 1 - col
+			}
+			groupAssignments[col] = append(groupAssignments[col], reg)
+		}
+
+		for gi, group := range groups {
+			for _, reg := range groupAssignments[gi] {
+				gr := &model.GroupRegistration{GroupID: group.ID, RegistrationID: reg.ID}
+				if err := stageRepo.AddGroupRegistration(gr); err != nil {
+					return fmt.Errorf("assign player to group: %w", err)
+				}
+			}
+			gid := group.ID
+			fmt.Printf("Generating matches for %s with %d players\n", group.Name, len(groupAssignments[gi]))
+			if _, err := rrEngine.GenerateMatches(stage, tournament, groupAssignments[gi], &gid); err != nil {
+				return fmt.Errorf("generate matches for %s: %w", group.Name, err)
 			}
 		}
-		gid := group.ID
-		if _, err := e.rrEngine.GenerateMatches(stage, tournament, groupAssignments[gi], &gid); err != nil {
-			return nil, fmt.Errorf("generate matches for %s: %w", group.Name, err)
-		}
+
+		return nil
+		
+	})
+	if err != nil {
+		return nil, fmt.Errorf("draw groups: %w", err)
 	}
+
 	return groups, nil
+
 }
 
 // RankedStandings returns standings for a group with tiebreakers applied.

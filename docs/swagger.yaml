@@ -5,9 +5,7 @@ definitions:
       email:
         type: string
       metadata:
-        items:
-          type: integer
-        type: array
+        type: object
       name:
         type: string
     required:
@@ -79,17 +77,15 @@ definitions:
     type: object
   github_com_uthmanduro_BracketForge_internal_model.Group:
     properties:
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
       id:
         type: string
       name:
         type: string
       stage_id:
         type: string
-      updatedAt:
+      updated_at:
         type: string
     type: object
   github_com_uthmanduro_BracketForge_internal_model.LoginRequest:
@@ -199,10 +195,6 @@ definitions:
     properties:
       created_at:
         type: string
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
       email:
         type: string
       id:
@@ -214,8 +206,6 @@ definitions:
       name:
         type: string
       organization_id:
-        type: string
-      updatedAt:
         type: string
     type: object
   github_com_uthmanduro_BracketForge_internal_model.RegisterPlayerRequest:
@@ -317,10 +307,6 @@ definitions:
         type: integer
       created_at:
         type: string
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
       id:
         type: string
       name:
@@ -331,8 +317,6 @@ definitions:
         type: string
       type:
         $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.StageType'
-      updatedAt:
-        type: string
     type: object
   github_com_uthmanduro_BracketForge_internal_model.StageType:
     enum:
@@ -406,10 +390,6 @@ definitions:
         type: integer
       created_at:
         type: string
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
       end_date:
         type: string
       format:
@@ -430,8 +410,6 @@ definitions:
         $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.TournamentStatus'
       third_place_match:
         type: boolean
-      updatedAt:
-        type: string
     type: object
   github_com_uthmanduro_BracketForge_internal_model.TournamentFormat:
     enum:
@@ -445,10 +423,8 @@ definitions:
     - GroupKnockout
   github_com_uthmanduro_BracketForge_internal_model.TournamentRegistration:
     properties:
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
       id:
         type: string
       player_id:
@@ -464,7 +440,7 @@ definitions:
         type: string
       tournament_id:
         type: string
-      updatedAt:
+      updated_at:
         type: string
     type: object
   github_com_uthmanduro_BracketForge_internal_model.TournamentStatus:
@@ -493,10 +469,6 @@ definitions:
     properties:
       created_at:
         type: string
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
       email:
         type: string
       id:
@@ -505,8 +477,6 @@ definitions:
         type: string
       role:
         $ref: '#/definitions/github_com_uthmanduro_BracketForge_internal_model.Role'
-      updatedAt:
-        type: string
     type: object
   gorm.DeletedAt:
     properties:

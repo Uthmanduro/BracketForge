@@ -47,6 +47,12 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
+	u, err := h.UserService.GetByEmail(email)
+	if u != nil {
+		c.JSON(400, model.ErrorResponse{Error: "Email already exists"})
+		return
+	}
+
 	user, err := h.UserService.Register(orgID, email, password, role)
 	if err != nil {
 		c.JSON(500, model.ErrorResponse{Error: "Failed to register user"})

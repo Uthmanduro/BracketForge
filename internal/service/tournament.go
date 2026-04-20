@@ -1,60 +1,3 @@
-// package service
-
-// import (
-// 	"context"
-// 	"fmt"
-// 	"time"
-
-// 	"github.com/uthmanduro/BracketForge/internal/model"
-// 	"github.com/uthmanduro/BracketForge/internal/repository"
-// )
-
-// type TournamentService struct {
-// 	TournamentRepo *repository.TournamentRepo
-// }
-
-// func NewTournamentService(tournamentRepo *repository.TournamentRepo) *TournamentService {
-// 	return &TournamentService{
-// 		TournamentRepo: tournamentRepo,
-// 	}
-// }
-
-// func (s *TournamentService) CreateTournament(ctx context.Context, name, description, format string, organizationID uint, startDate, endDate *time.Time) (*model.Tournament, error) {
-// 	//check if tournament with the same name already exists in the organization
-// 	existingTournament, err := s.TournamentRepo.GetTournamentByNameAndOrgID(ctx, name, organizationID)
-// 	if err == nil && existingTournament != nil {
-// 		return nil, fmt.Errorf("tournament with the same name already exists in the organization")
-// 	}
-
-// 	tournament := &model.Tournament{
-// 		Name:           name,
-// 		Description:    description,
-// 		Format:         model.TournamentFormat(format),
-// 		OrganizationID: organizationID,
-// 		StartDate:      startDate,
-// 		EndDate:        endDate,
-// 	}
-// 	err = s.TournamentRepo.CreateTournament(ctx, tournament)
-// 	if err != nil {
-// 		fmt.Printf("Error creating tournament: %v\n", err)
-// 		return nil, err
-// 	}
-// 	return tournament, nil
-// }
-
-// func (s *TournamentService) GetTournamentByID(ctx context.Context, id uint) (*model.Tournament, error) {
-// 	return s.TournamentRepo.GetTournamentByID(ctx, id)
-// }
-
-// func (s *TournamentService) UpdateTournament(ctx context.Context, tournament *model.Tournament) error {
-// 	return s.TournamentRepo.UpdateTournament(ctx, tournament)
-// }
-
-// func (s *TournamentService) DeleteTournament(ctx context.Context, id uint) error {
-// 	return s.TournamentRepo.DeleteTournament(ctx, id)
-// }
-
-
 package service
 
 import (
@@ -197,7 +140,7 @@ func (s *TournamentService) ListStages(tournID, orgID string) ([]*model.Stage, e
 
 // ── Draw and bracket ───────────────────────────────────────────────────────
 
-func (s *TournamentService) RunGroupDraw(tournID, orgID, stageID string, req *model.DrawRequest) ([]*model.Group, error) {
+func (s *TournamentService) RunGroupDraw(ctx context.Context, tournID, orgID, stageID string, req *model.DrawRequest) ([]*model.Group, error) {
 	t, err := s.tournRepo.GetByID(tournID, orgID)
 	if err != nil {
 		return nil, err
@@ -213,7 +156,7 @@ func (s *TournamentService) RunGroupDraw(tournID, orgID, stageID string, req *mo
 	if err != nil {
 		return nil, err
 	}
-	return s.groupEngine.Draw(stage, t, regs, req.NumberOfGroups)
+	return s.groupEngine.Draw(ctx, stage, t, regs, req.NumberOfGroups)
 }
 
 func (s *TournamentService) GenerateBracket(tournID, orgID, stageID string) ([]*model.Match, error) {

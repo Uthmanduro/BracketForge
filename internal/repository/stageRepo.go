@@ -31,6 +31,10 @@ func (r *StageRepo) CreateGroup(g *model.Group) error {
 	return r.db.Create(g).Error
 }
 
+func (r *StageRepo) CreateGroupTx(tx *gorm.DB, g *model.Group) error {
+	return tx.Create(g).Error
+}
+
 func (r *StageRepo) GetGroup(id string) (*model.Group, error) {
 	var g model.Group
 	return &g, r.db.First(&g, "id = ?", id).Error
@@ -47,7 +51,13 @@ func (r *StageRepo) AddGroupRegistration(gr *model.GroupRegistration) error {
 	return r.db.Create(gr).Error
 }
 
+func (r *StageRepo) AddGroupRegistrationTx(tx *gorm.DB, gr *model.GroupRegistration) error {
+	return tx.Create(gr).Error
+}
+
 func (r *StageRepo) ListGroupRegistrations(groupID string) ([]*model.GroupRegistration, error) {
 	var list []*model.GroupRegistration
 	return list, r.db.Where("group_id = ?", groupID).Find(&list).Error
 }
+
+func (r *StageRepo) WithTx(tx *gorm.DB) *StageRepo { return &StageRepo{db: tx} }

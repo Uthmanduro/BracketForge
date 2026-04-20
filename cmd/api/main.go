@@ -65,7 +65,7 @@ func main() {
 	// ── Engines ───────────────────────────────────────────────────────
 	rrEngine       := engine.NewRoundRobinEngine(matchRepo, standRepo)
 	seEngine       := engine.NewSingleEliminationEngine(matchRepo)
-	groupEngine    := engine.NewGroupEngine(stageRepo, matchRepo, standRepo, rrEngine)
+	groupEngine    := engine.NewGroupEngine(store, stageRepo, matchRepo, standRepo, rrEngine)
 	resultEngine   := engine.NewResultEngine(matchRepo, standRepo, stageRepo, store)
 	walkoverEngine := engine.NewWalkoverEngine(matchRepo)
  
